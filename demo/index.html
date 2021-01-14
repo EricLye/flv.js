@@ -14,7 +14,7 @@
             <div id="streamURL">
                 <div class="url-input">
                     <label for="sURL">Stream URL:</label>
-                    <input id="sURL" type="text" value="http://127.0.0.1/flv/7182741-1.flv" />
+                    <input id="sURL" type="text" value="https://iche.actanker.com:4026/flv?port=10077&app=live&stream=13687666452_channel_3_playback" />
                     <button onclick="switch_mds()">Switch to MediaDataSource</button>
                 </div>
                 <div class="options">
@@ -68,6 +68,7 @@
                 var xhr = new XMLHttpRequest();
                 xhr.open('GET', url, true);
                 xhr.onload = function (e) {
+                    debugger
                     var mediaDataSource = JSON.parse(xhr.response);
                     flv_load_mds(mediaDataSource);
                 }
@@ -101,7 +102,7 @@
             }
             player = flvjs.createPlayer(mediaDataSource, {
                 enableWorker: false,
-                lazyLoadMaxDuration: 3 * 60,
+                lazyLoadMaxDuration: 60,
                 seekType: 'range',
             });
             player.attachMediaElement(element);

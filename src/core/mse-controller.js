@@ -23,7 +23,10 @@ import MSEEvents from './mse-events.js';
 import {SampleInfo, IDRSampleList} from './media-segment-info.js';
 import {IllegalStateException} from '../utils/exception.js';
 
-// Media Source Extensions controller
+/**
+ * Media Source Extensions controller
+ *
+ */
 class MSEController {
 
     constructor(config) {
@@ -50,6 +53,7 @@ class MSEController {
         this._mediaElement = null;
 
         this._isBufferFull = false;
+
         this._hasPendingEos = false;
 
         this._requireSetMediaDuration = false;
@@ -60,10 +64,12 @@ class MSEController {
             video: null,
             audio: null
         };
+        // 缓存
         this._sourceBuffers = {
             video: null,
             audio: null
         };
+        // 上次初始化的片段
         this._lastInitSegments = {
             video: null,
             audio: null
@@ -76,7 +82,7 @@ class MSEController {
             video: [],
             audio: []
         };
-        this._idrList = new IDRSampleList();
+        this._idrList = new IDRSampleList();    
     }
 
     destroy() {
@@ -97,6 +103,7 @@ class MSEController {
     }
 
     attachMediaElement(mediaElement) {
+        debugger;
         if (this._mediaSource) {
             throw new IllegalStateException('MediaSource has been attached to an HTMLMediaElement!');
         }
@@ -166,6 +173,7 @@ class MSEController {
     }
 
     appendInitSegment(initSegment, deferred) {
+
         if (!this._mediaSource || this._mediaSource.readyState !== 'open') {
             // sourcebuffer creation requires mediaSource.readyState === 'open'
             // so we defer the sourcebuffer creation, until sourceopen event triggered
@@ -205,7 +213,7 @@ class MSEController {
         }
 
         if (!deferred) {
-            // deferred means this InitSegment has been pushed to pendingSegments queue
+            // deferred means this InitSegment has been pushed to pendingSegments queue todo key
             this._pendingSegments[is.type].push(is);
         }
         if (!firstInitSegment) {  // append immediately only if init segment in subsequence

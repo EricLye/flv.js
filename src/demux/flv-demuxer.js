@@ -42,7 +42,9 @@ function ReadBig32(array, index) {
             (array[index + 3]));
 }
 
-
+/**
+ * FLV 媒体数据格式的解析器
+ */
 class FLVDemuxer {
 
     constructor(probeData, config) {

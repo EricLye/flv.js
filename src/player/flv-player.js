@@ -68,8 +68,11 @@ class FlvPlayer {
         this._progressChecker = null;
 
         this._mediaDataSource = mediaDataSource;
+        // H5的video DOM
         this._mediaElement = null;
+        // MSE controller,操作 Media Source Extensions的工具
         this._msectl = null;
+        // 格式转换工具？？
         this._transmuxer = null;
 
         this._mseSourceOpened = false;
@@ -128,6 +131,7 @@ class FlvPlayer {
         this._emitter.removeListener(event, listener);
     }
 
+    // 绑定dom(H5的video标签)
     attachMediaElement(mediaElement) {
         this._mediaElement = mediaElement;
         mediaElement.addEventListener('loadedmetadata', this.e.onvLoadedMetadata);
@@ -136,6 +140,7 @@ class FlvPlayer {
         mediaElement.addEventListener('stalled', this.e.onvStalled);
         mediaElement.addEventListener('progress', this.e.onvProgress);
 
+        // 操作视频源
         this._msectl = new MSEController(this._config);
 
         this._msectl.on(MSEEvents.UPDATE_END, this._onmseUpdateEnd.bind(this));
@@ -209,9 +214,11 @@ class FlvPlayer {
         this._transmuxer = new Transmuxer(this._mediaDataSource, this._config);
 
         this._transmuxer.on(TransmuxingEvents.INIT_SEGMENT, (type, is) => {
+            // todo 关键点：找出flv的tag
             this._msectl.appendInitSegment(is);
         });
         this._transmuxer.on(TransmuxingEvents.MEDIA_SEGMENT, (type, ms) => {
+            // todo 关键点：找出flv的tag
             this._msectl.appendMediaSegment(ms);
 
             // lazyLoad check
@@ -395,6 +402,7 @@ class FlvPlayer {
         }
     }
 
+    // 缓存满了？？？？？
     _onmseBufferFull() {
         Log.v(this.TAG, 'MSE SourceBuffer is full, suspend transmuxing task');
         if (this._progressChecker == null) {
@@ -452,6 +460,10 @@ class FlvPlayer {
         return false;
     }
 
+    /*
+    先搜索一下缓存
+    @param seconds时间，是否是时间戳还待定
+     */
     _internalSeek(seconds) {
         let directSeek = this._isTimepointBuffered(seconds);
 
@@ -528,6 +540,11 @@ class FlvPlayer {
         }
     }
 
+    /**
+     * 进度条？
+     * @param stalled
+     * @private
+     */
     _checkAndResumeStuckPlayback(stalled) {
         let media = this._mediaElement;
         if (stalled || !this._receivedCanPlay || media.readyState < 2) {  // HAVE_CURRENT_DATA
@@ -543,14 +560,20 @@ class FlvPlayer {
             this._mediaElement.removeEventListener('progress', this.e.onvProgress);
         }
     }
-
+    /*
+    将<video>的currentTime属性改为_pendingSeekTime
+    _pendingSeekTime本身保存了currentTime
+     */
     _onvLoadedMetadata(e) {
         if (this._pendingSeekTime != null) {
+            //
             this._mediaElement.currentTime = this._pendingSeekTime;
             this._pendingSeekTime = null;
         }
     }
-
+    /*
+    拖动播放时查询
+     */
     _onvSeeking(e) {  // handle seeking request from browser's progress bar
         let target = this._mediaElement.currentTime;
         let buffered = this._mediaElement.buffered;

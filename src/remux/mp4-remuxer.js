@@ -234,7 +234,7 @@ class MP4Remuxer {
         if (this._audioMeta == null) {
             return;
         }
-
+        // track 是一个很重要的对象，目前不知道是啥
         let track = audioTrack;
         let samples = track.samples;
         let dtsCorrection = undefined;
